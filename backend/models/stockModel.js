@@ -43,11 +43,21 @@ const stockOut = async (itemId, quantity) => {
     return result;
 };
 
+// Get stock and low-stock threshold
+const getLowStockStatus = async (itemId) => {
+    const [rows] = await db.query(
+        "SELECT quantity, low_stock_threshold FROM inventory WHERE id = ?",
+        [itemId]
+    );
+
+    return rows[0];
+};
 
 
 module.exports = {
     getStockQuantity,
     updateStockQuantity,
     stockIn,
-    stockOut
+    stockOut,
+    getLowStockStatus
 };

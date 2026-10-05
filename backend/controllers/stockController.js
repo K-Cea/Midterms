@@ -167,6 +167,39 @@ const removeStock = async (req, res) => {
     }
 };
 
+// Check low-stock status
+const checkLowStock = async (req, res) => {
+    try {
+        const { itemId } = req.params;
+
+        const stock =
+            await stockModel.getLowStockStatus(itemId);
+
+        if (!stock) {
+            return res.status(404).json({
+                error: "Item not found"
+            });
+        }
+
+        const isLowStock =
+            stock.quantity <= stock.low_stock_threshold;
+
+        res.status(200).json({
+            itemId: itemId,
+            quantity: stock.quantity,
+            lowStockThreshold: stock.low_stock_threshold,
+            lowStock: isLowStock
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            error: "Failed to check stock level"
+        });
+    }
+};
+
 module.exports = {
     getStock,
     updateStock,
