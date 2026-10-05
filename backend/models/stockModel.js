@@ -1,0 +1,26 @@
+const db = require("../config/db");
+
+// Get current stock quantity
+const getStockQuantity = async (itemId) => {
+    const [rows] = await db.query(
+        "SELECT quantity FROM inventory WHERE id = ?",
+        [itemId]
+    );
+
+    return rows[0];
+};
+
+// Update stock quantity
+const updateStockQuantity = async (itemId, quantity) => {
+    const [result] = await db.query(
+        "UPDATE inventory SET quantity = ? WHERE id = ?",
+        [quantity, itemId]
+    );
+
+    return result;
+};
+
+module.exports = {
+    getStockQuantity,
+    updateStockQuantity
+};
