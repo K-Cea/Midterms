@@ -19,16 +19,69 @@ export const createProduct = (req, res) => {
     });
   }
 
-  const newProduct = Product.create({
-    sku,
-    name,
-    price,
-    quantity,
-    lowStockThreshold
-  });
-
+  const newProduct = Product.create({ sku, name, price, quantity, lowStockThreshold });
   return res.status(201).json({
     success: true,
     data: newProduct
+  });
+};
+
+export const getProducts = (req, res) => {
+  const products = Product.findAll();
+  return res.status(200).json({
+    success: true,
+    data: products
+  });
+};
+
+export const getProductById = (req, res) => {
+  const { id } = req.params;
+  const product = Product.findById(id);
+
+  if (!product) {
+    return res.status(404).json({
+      success: false,
+      message: `Product with ID "${id}" not found`
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: product
+  });
+};
+
+export const updateProduct = (req, res) => {
+  const { id } = req.params;
+  const existingProduct = Product.findById(id);
+
+  if (!existingProduct) {
+    return res.status(404).json({
+      success: false,
+      message: `Product with ID "${id}" not found`
+    });
+  }
+
+  const updatedProduct = Product.update(id, req.body);
+  return res.status(200).json({
+    success: true,
+    data: updatedProduct
+  });
+};
+
+export const deleteProduct = (req, res) => {
+  const { id } = req.params;
+  const deleted = Product.delete(id);
+
+  if (!deleted) {
+    return res.status(404).json({
+      success: false,
+      message: `Product with ID "${id}" not found`
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: 'Product deleted successfully'
   });
 };
