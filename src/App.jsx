@@ -20,9 +20,13 @@ function App() {
     setProducts(products.map(p => p.id === id ? { ...p, ...updates } : p));
   };
 
+  const handleDeleteProduct = (id) => {
+    setProducts(products.filter(p => p.id !== id));
+  };
+
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial' }}>
-      <h1>Inventory Management System (INV-FE-03)</h1>
+      <h1>Inventory Management System (INV-FE-04)</h1>
       
       <button onClick={() => setIsAddOpen(true)}>Add New Product</button>
 
@@ -47,7 +51,7 @@ function App() {
           setSelectedProduct(prod);
           setIsEditOpen(true);
         }} 
-        onDelete={(id) => setProducts(products.filter(p => p.id !== id))} 
+        onDelete={handleDeleteProduct} 
       />
     </div>
   );
