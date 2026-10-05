@@ -1,32 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductTable from './components/ProductTable';
 import AddProductForm from './components/AddProductForm';
 import EditProductForm from './components/EditProductForm';
+import { fetchProducts, createProduct, updateProduct, removeProduct } from './api';
 
 function App() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [products, setProducts] = useState([
-    { id: 'prod_1', sku: 'SKU-1', name: 'Bolts', price: 4.5, quantity: 100, lowStockThreshold: 20 }
-  ]);
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleAddProduct = (newProduct) => {
-    const productWithId = { ...newProduct, id: 'prod_' + Date.now() };
-    setProducts([...products, productWithId]);
+  // Load products when the app starts
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    try {
+      setIsLoading(true);
+      const data = await fetchProducts();
+      setProducts(data || []);
+    } catch (error) {
+      console.error('Failed to load products', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEditProduct = (id, updates) => {
-    setProducts(products.map(p => p.id === id ? { ...p, ...updates } : p));
+  const handleAddProduct = async (newProduct) => {
+    try {
+      const savedProduct = await createProduct(newProduct);
+      setProducts([...products, savedProduct]);
+    } catch (error) {
+      console.error('Failed to add product', error);
+    }
   };
 
-  const handleDeleteProduct = (id) => {
-    setProducts(products.filter(p => p.id !== id));
+  const handleEditProduct = async (id, updates) => {
+    try {
+      const updated = await updateProduct(id, updates);
+      setProducts(products.map(p => p.id === id ? updated : p));
+    } catch (error) {
+      console.error('Failed to update product', error);
+    }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    try {
+      await removeProduct(id);
+      setProducts(products.filter(p => p.id !== id));
+    } catch (error) {
+      console.error('Failed to delete product', error);
+    }
   };
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial' }}>
-      <h1>Inventory Management System (INV-FE-04)</h1>
+      <h1>Inventory Management System (INV-FE-05)</h1>
       
       <button onClick={() => setIsAddOpen(true)}>Add New Product</button>
 
@@ -47,6 +78,7 @@ function App() {
 
       <ProductTable 
         products={products} 
+        isLoading={isLoading}
         onEdit={(prod) => {
           setSelectedProduct(prod);
           setIsEditOpen(true);
