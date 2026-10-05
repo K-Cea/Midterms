@@ -6,10 +6,10 @@ const {
     updateStock
 } = require("../controllers/stockController");
 
-// Get current stock quantity
 router.get("/:itemId", getStock);
 
-// Update stock quantity
 router.put("/:itemId", updateStock);
+
+router.post("/:itemId/in", addStock);
 
 module.exports = router;

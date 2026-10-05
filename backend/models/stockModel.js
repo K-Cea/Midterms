@@ -20,7 +20,19 @@ const updateStockQuantity = async (itemId, quantity) => {
     return result;
 };
 
+
+// Add stock quantity
+const stockIn = async (itemId, quantity) => {
+    const [result] = await db.query(
+        "UPDATE inventory SET quantity = quantity + ? WHERE id = ?",
+        [quantity, itemId]
+    );
+
+    return result;
+};
+
 module.exports = {
     getStockQuantity,
-    updateStockQuantity
+    updateStockQuantity,
+    stockIn
 };
