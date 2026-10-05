@@ -106,8 +106,53 @@ const addStock = async (req, res) => {
     }
 };
 
+// Stock Out
+const removeStock = async (req, res) => {
+    try {
+        const { itemId } = req.params;
+        const { quantity } = req.body;
+
+        // Quantity must be greater than 0
+        if (typeof quantity !== "number" || quantity <= 0) {
+            return res.status(400).json({
+                error: "Quantity must be greater than 0"
+            });
+        }
+
+        const result = await stockModel.stockOut(
+            itemId,
+            quantity
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                error: "Item not found"
+            });
+        }
+
+        // Get updated stock
+        const updatedStock =
+            await stockModel.getStockQuantity(itemId);
+
+        res.status(200).json({
+            message: "Stock removed successfully",
+            itemId: itemId,
+            quantityRemoved: quantity,
+            currentStock: updatedStock.quantity
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            error: "Failed to remove stock"
+        });
+    }
+};
+
 module.exports = {
     getStock,
     updateStock,
-    addStock
+    addStock,
+    removeStock
 };
