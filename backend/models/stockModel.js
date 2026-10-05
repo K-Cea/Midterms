@@ -31,15 +31,19 @@ const stockIn = async (itemId, quantity) => {
     return result;
 };
 
-// Remove stock
+// Remove stock only if enough stock is available
 const stockOut = async (itemId, quantity) => {
     const [result] = await db.query(
-        "UPDATE inventory SET quantity = quantity - ? WHERE id = ?",
-        [quantity, itemId]
+        `UPDATE inventory
+         SET quantity = quantity - ?
+         WHERE id = ? AND quantity >= ?`,
+        [quantity, itemId, quantity]
     );
 
     return result;
 };
+
+
 
 module.exports = {
     getStockQuantity,

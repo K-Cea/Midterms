@@ -119,18 +119,35 @@ const removeStock = async (req, res) => {
             });
         }
 
+        // Check if item exists and has enough stock
+        const currentStock =
+            await stockModel.getStockQuantity(itemId);
+
+        if (!currentStock) {
+            return res.status(404).json({
+                error: "Item not found"
+            });
+        }
+
+        if (currentStock.quantity < quantity) {
+            return res.status(400).json({
+                error: "Insufficient stock",
+                currentStock: currentStock.quantity,
+                requestedQuantity: quantity
+            });
+        }
+
         const result = await stockModel.stockOut(
             itemId,
             quantity
         );
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({
-                error: "Item not found"
+            return res.status(400).json({
+                error: "Unable to remove stock"
             });
         }
 
-        // Get updated stock
         const updatedStock =
             await stockModel.getStockQuantity(itemId);
 
