@@ -50,3 +50,21 @@ export const getProductById = (req, res) => {
     data: product
   });
 };
+
+export const updateProduct = (req, res) => {
+  const { id } = req.params;
+  const existingProduct = Product.findById(id);
+
+  if (!existingProduct) {
+    return res.status(404).json({
+      success: false,
+      message: `Product with ID "${id}" not found`
+    });
+  }
+
+  const updatedProduct = Product.update(id, req.body);
+  return res.status(200).json({
+    success: true,
+    data: updatedProduct
+  });
+};
